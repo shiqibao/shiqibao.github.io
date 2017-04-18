@@ -19,3 +19,5 @@ MathJax.Hub.Config({
 });
 </script>
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+jekyll serve执行本地测试
