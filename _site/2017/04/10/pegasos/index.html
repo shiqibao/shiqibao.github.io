@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>svm随机次梯度下降算法-pegasos - 记录之道</title>
+
+	<link rel="shortcut icon" href="/styles/images/favicon.jpg">
+	<link rel="icon" href="/styles/images/favicon.jpg">
+
+	<link rel="stylesheet" href="/styles/css/index.css">
+	<link rel="stylesheet" href="/styles/css/fontawesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/styles/css/syntax.css">
+	<link rel="canonical" href="/2017/04/10/pegasos/">
+	<link rel="alternate" type="application/rss+xml" title="记录之道" href="/feed.xml">
+	
+	<meta name="description" content="康志华;个人博客;学而不思则罔;思而不学则殆;生命不止;折腾不休">
+
+	<script src="/styles/js/jquery.min.js"></script>
+	<!--[if lt IE 9]>
+    	<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  	<![endif]-->
+  	<script>
+		var _hmt = _hmt || [];
+		(function() {
+		  var hm = document.createElement("script");
+		  hm.src = "//hm.baidu.com/hm.js?94be4b0f9fc5d94cc0d0415ea6761ae9";
+		  var s = document.getElementsByTagName("script")[0]; 
+		  s.parentNode.insertBefore(hm, s);
+		})();
+	</script>
+  	<style type="text/css">
+	  	.docs-content{
+	  		margin-bottom: 10px;
+	  	}
+  	</style>
+</head>
+
+  <body class="index">
+
+    <header class="navbar navbar-inverse navbar-fixed-top docs-nav" role="banner">
+  <div class="container">
+    <div class="navbar-header">
+      <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".bs-navbar-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a href="/" class="navbar-brand">
+        <img src="/styles/images/logo.jpg">
+      </a>
+    </div>
+    <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+      <ul class="nav navbar-nav">    
+        <li>
+          <a href="/">Home</a>
+        </li>
+        <li>
+          <a href="/categories/">大类分解</a>
+        </li>
+        <li>
+          <a href="/tag">小类内聚</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a><span id="busuanzi_container_site_pv">本站总访问量<span id="busuanzi_value_site_pv"></span>次</span></a>
+        </li>
+        <li>
+          <a href="/donate/"><strong>打赏</strong></a>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">关于<b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a rel="nofollow" target="_blank" href="https://github.com/shiqibao/">Github</a></li>
+            <li><a rel="nofollow" target="_blank" href="http://www.hifreud.com/Resume.io/">关于作者</a></li>
+            <li><a rel="nofollow" href="/books">我的书单</a></li>
+            <li><a rel="nofollow" href="/reference">推荐博客</a></li>
+            <li><a href="/feed.xml">RSS订阅</a></li>
+            <li class="divider"></li>
+            <li><a rel="nofollow" target="_blank" href="https://github.com/luoyan35714/LessOrMore.git">本项目</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
+    <div class="docs-header" id="content">
+  <div class="container">
+  	
+  		<!--
+		    <h1>svm随机次梯度下降算法-pegasos</h1>
+		    <p>Post on Apr 10, 2017 by <a href="/about">鲍世琦</a></p>
+		-->
+		    <h1>It's our wits that make us men.</h1>
+    
+  </div>
+</div>
+    
+      
+<div class="banner">
+  <div class="container">
+  	
+    	<a href="/categories/#machine learning-ref">machine learning</a>	/
+    	<a href="/tag/#-ref"></a>
+    
+  </div>
+</div>
+
+    
+
+    <div class="container docs-container">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="sidebar hidden-print" role="complementary">
+        <div id="navigation">
+  <h1>目录</h1>
+  <ul class="nav sidenav">
+<!--
+    
+      
+      
+      
+      
+
+      
+        <li><a href="#year_2017">2017</a>
+          <ul class="nav">
+            <li><a href="#month_2017_April">April</a></li>
+      
+
+      
+            
+          
+        
+      
+    
+      
+      
+      
+      
+
+      
+
+      
+            
+          
+        
+      
+    
+      
+      
+      
+      
+
+      
+
+      
+            </ul>
+          </li>
+      
+    
+-->
+  </ul>
+</div> 
+      </div>
+    </div>
+    <div class="col-md-9" role="main">
+      <div class="panel docs-content">
+        <div class="wrapper">
+            <header class="post-header">
+              <h1 class="post-title">svm随机次梯度下降算法-pegasos</h1>
+              <!--
+                <p class="post-meta">Apr 10, 2017 • baoshiqi</p>
+              -->
+              <div class="meta">Posted on <span class="postdate">Apr 10, 2017</span> By <a target="_blank" href="http://localhost:4000">鲍世琦</a></div>
+              <br />
+            </header>
+            <article class="post-content">
+              <ul id="markdown-toc">
+  <li><a href="#基本思想" id="markdown-toc-基本思想">基本思想</a></li>
+  <li><a href="#摘要" id="markdown-toc-摘要">摘要</a></li>
+  <li><a href="#引言" id="markdown-toc-引言">引言</a></li>
+  <li><a href="#pegasos-算法" id="markdown-toc-pegasos-算法">pegasos 算法</a>    <ul>
+      <li><a href="#基本算法" id="markdown-toc-基本算法">基本算法</a>        <ul>
+          <li><a href="#伪代码如下" id="markdown-toc-伪代码如下">伪代码如下：</a></li>
+        </ul>
+      </li>
+      <li><a href="#稀疏特征" id="markdown-toc-稀疏特征">稀疏特征</a></li>
+    </ul>
+  </li>
+  <li><a href="#核函数解决非线性分类问题" id="markdown-toc-核函数解决非线性分类问题">核函数解决非线性分类问题</a></li>
+  <li><a href="#结合偏置项b" id="markdown-toc-结合偏置项b">结合偏置项b</a></li>
+  <li><a href="#实验比对" id="markdown-toc-实验比对">实验比对</a>    <ul>
+      <li><a href="#线性核" id="markdown-toc-线性核">线性核</a></li>
+      <li><a href="#高斯核非线性核" id="markdown-toc-高斯核非线性核">高斯核（非线性核）</a></li>
+    </ul>
+  </li>
+</ul>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<h2 id="基本思想">基本思想</h2>
+<p>使用随机梯度下降直接解SVM的原始问题。</p>
+<h2 id="摘要">摘要</h2>
+<p>本文研究和分析了基于随机梯度下降的SVM优化算法，简单且高效。（Ο是渐进上界，Ω是渐进下界）本文证明为获得一定准确率精度$ \epsilon$所需的迭代次数满足$O{(\frac1 \epsilon)}$，且每一次迭代都只使用一个训练样本。相比之下，以前分析的SVM随机梯度下降次数满足$\Omega{(\frac {1} {\epsilon^2})}$。以前设计的SVM中，迭代次数也与$\frac 1 \lambda$线性相关 。对于线性核，pegasos算法的总运行时间是$O{(\frac d {\epsilon \lambda})}$,其中d是每一个样本中非零特征在边界上的个数。因此，运行时间和训练集的大小不是直接相关的，那么本算法尤其适合大规模的数据集。本文算法也可以拓展到非线性核上，但只能基于原始的目标函数，此时的运行时间和数据集大小线性相关$O{(\frac m{\epsilon \lambda})}$。本文算法尤其适用于大规模文本分类问题，比之前的SVM加速了几个数量级。</p>
+<h2 id="引言">引言</h2>
+<p>SVM是一种高效流行的分类器、SVM是一种典型的受限二次规划问题。然而，基于基本形式，SVM实际上是一个附带惩罚因子的无限制经验损失最小化问题。
+定义目标函数为
+ <script type="math/tex">f(\omega) = \min_w \frac{\lambda}{2}||\omega||^2 + \frac 1 m \sum l(\omega,(x,y))</script></p>
+
+<p>其中：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+l(\omega,(x,y))=max\{0,1-y<\omega,x>\} %]]></script>
+
+<p>使用随机梯度下降解目标函数的算法称作pegasos。在每一次的迭代中，随机挑选一个训练样本计算目标函数的梯度，然后在在相反的方向走一个预订好的步长。根据上述算法，整体算法的运行时间满足$O{(\frac n {\lambda \epsilon})}$,其中n是w和x的维度。算法可以进一步优化为$O{(\frac d {\epsilon \lambda})}$,其中d是每一个样本中非零特征在边界上的个数。pegasos只与算法的随机步骤有关，和数据集无关。</p>
+
+<ol>
+  <li>Interior Point (IP) methods：可以使用拟牛顿法对目标函数进行优化，但算法因为使用了如海森矩阵等便需$m^2$的空间复杂度， 其中m是样本数。</li>
+  <li>Decomposition methods: 使用类似SMO的算法解SVM的对偶优化问题，但是这会导致相对比较慢的收敛速率。</li>
+  <li>Primal optimization:SVM大部分的求解方法都在解决对偶问题，尤其是在非线性核问题上。因为，即使SVM使用了非线性核，我们也可以将$\omega$替换为 $\sum \alpha_i y_i x_i$，从而将解决原目标函数的受约束优化问题转化为没有约束条件的优化问题。其实，直接解决原问题也有人研究过，比如使用smooth loss functions代替 hinge loss，这样将问题变成一个平滑的不受限制的优化问题，然后使用梯度下降和牛顿法来求解。本文采取了类似方法，针对hinge loss的不可微性，直接使用sub-gradients（子梯度）代替梯度。</li>
+  <li>尽管随机梯度下降算法是最差的优化算法，但是可以产生最好的泛化性能。</li>
+  <li>有一种基于随机子梯度下降的算法和pegasos比较类似，但是其非常重要的一部分是学习步长的设置，收敛速率最坏的上界是$\Omega{(\frac {1} {(\lambda \epsilon)^2})}$。欧几里得距离的平方可以被优化到0，但是收敛速率决定于步长参数的设置。pegasos调参简单。</li>
+  <li>online methods：在线学习算法一般与随机梯度下降算法结合，如每一次迭代只使用一个样本。在线学习算法被提出为SVM的快速替代方案。在线算法可以使用在线到批量转换方案来获得具有低泛化误差的预测器，但是这种方法不一定能够解决原问题的$\epsilon$精度要求，并且它们的性能通常低于直接批量优化器。如上所述，Pegasos共享了在线学习算法的简单性和速度，但它保证融合到最优的SVM解决方案。</li>
+</ol>
+
+<h2 id="pegasos-算法">pegasos 算法</h2>
+<p>基于上述提到的方法，pegasos在原始目标函数上通过精致挑选的步长使用随机梯度下降求解。将在本部分详细描述pegasos的过程并提供伪代码。同时也阐述基本算法的一系列变种，并讨论几个实际问题。</p>
+<h3 id="基本算法">基本算法</h3>
+<p>随机选取一个训练样本$it$ 其中i代表选取的样本，t代表迭代的次数，带入</p>
+
+<script type="math/tex; mode=display">f(\omega) = \min_w \frac{\lambda}{2}||\omega||^2 + \frac 1 m \sum l(\omega,(x,y))</script>
+
+<p>得到近似的目标函数：</p>
+
+<script type="math/tex; mode=display">f(\omega,i_t) = \frac{\lambda}{2}||\omega||^2 +  l(\omega,(x_{it},y_{it}))</script>
+
+<p>计算次梯度得：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\nabla_t = \lambda \omega_t - I[y_{it} \{\omega_t,x_{it}\}<1] y_{it}x_{it} %]]></script>
+
+<p>其中，$I[y_{it} {\omega_t,x_{it}}&lt;1]$ 是指示函数，如果是真则值为1，反之为0 。</p>
+<h4 id="伪代码如下">伪代码如下：</h4>
+<p><img src="http://img.blog.csdn.net/20170411144957908?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTI2Mzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></p>
+
+<p>输入数据集S,正则化因子$\lambda$，迭代次数T,则每一次迭代式为：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\omega_t+1  <= {\omega_t}-\eta_t\nabla_t %]]></script>
+
+<p>$\eta_t = \frac 1 {\lambda t}$是变动步长，和学习率$\lambda$成反比，随着迭代次数t的增加而减少。联合$\nabla_t = \lambda \omega_t - I[y_{it} {\omega_t,x_{it}}&lt;1] y_{it}x_{it}$展开迭代式得：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\omega_{t+1}  <= {\omega_t}-\eta_t [\lambda \omega_t - I[y_{it} \{\omega_t,x_{it}\}<1] y_{it}x_{it} ] %]]></script>
+
+<p>进一步推倒得：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\omega_{t+1 } <= {(1-\frac1 t)\omega_t}+\eta_t  I[y_{it} \{\omega_t,x_{it}\}<1] y_{it}x_{it} ] %]]></script>
+
+<p>如果指示函数为真，则：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\omega_t+1  <= {(1-\frac1 t)\omega_t}+\eta_t   y_{it}x_{it} %]]></script>
+
+<p>如果为假，则</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\omega_t+1  <= {(1-\frac1 t)\omega_t} %]]></script>
+
+<p>迭代T后，输出$\omega_t+1$</p>
+
+<p>类似的mini-batch  pegasos算法伪代码如下：
+<img src="http://img.blog.csdn.net/20170413133110678?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTI2Mzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></p>
+<h3 id="稀疏特征">稀疏特征</h3>
+<p>当训练集样本是稀疏的时候，可以把$\omega$表示成向量v 和标量a相乘。$\omega=a v$。那么容易证明每一次迭代的计算运行次数O(d)，d是非零元素的个数。</p>
+<h2 id="核函数解决非线性分类问题">核函数解决非线性分类问题</h2>
+<p>SVM的主要优势是可以使用核方法直接在特征空间分类。可以如此做关键是表示定理（ Representer Theorem ），根据表示定理可以通过训练数据的线性组合求得原目标函数的最优解。即在训练SVM的时候可以不直接使用训练数据，通过指定核操作的训练数据的内积结果训练。也就是说，不考虑训练样本x本身的线性函数的预测变量，我们考虑训练样本的隐式映射φ（x）后的线性函数的预测变量。
+推导过程如下：
+如求解线性不可分的$f(\omega)$,将x映射到特征空间：</p>
+
+<script type="math/tex; mode=display">f(\omega) = \min_w \frac{\lambda}{2}||\omega||^2 + \frac 1 m \sum_{(x,y) \in S} l(\omega;(\phi(x),y))</script>
+
+<p>其中：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+l(\omega;(\phi(x),y))=max\{0,1-y<\omega,\phi(x)>\} %]]></script>
+
+<p>为使用核函数将内积$&lt;\omega,\phi(x)&gt;$映射到特征空间的内积，将$\omega$用x来表示，通过对原目标函数求次梯度可以得到：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\omega_{t+1 } = {(1-\frac1 t)\omega_t}+\eta_t  I[y_{it} \{\omega_t,\phi(x_{it})\}<1] y_{it}\phi(x_{it}) %]]></script>
+
+<p>设：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+v_t =  I[y_{it} \{\omega_t,\phi(x_{it})\}<1] y_{it}\phi(x_{it}) %]]></script>
+
+<p>则迭代式重写为：</p>
+
+<script type="math/tex; mode=display">\omega_{t+1 } = {(1-\frac1 t)\omega_t}+\eta_t v_t</script>
+
+<p>根据迭代式的递推可得：</p>
+
+<script type="math/tex; mode=display">\omega_{t+1 } = {(\frac {t-1} t)\omega_t}+\eta_t v_t</script>
+
+<script type="math/tex; mode=display">\omega_{t+1 } = \frac 1 {\lambda t} \sum_{i=1}^t v_t</script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\omega_{t+1} = \frac 1 {\lambda t} \sum_{i=1}^t I[y_{it} \{\omega_t,\phi(x_{it})\}<1] y_{it}\phi(x_{it}) %]]></script>
+
+<p>设$\alpha_{t+1}[j]$ 为第t+1次，样本j被选中且损失不为0的次数（指示函数为1）。
+则：</p>
+
+<script type="math/tex; mode=display">\omega_{t+1} = \frac 1 {\lambda t} \sum_{j=1}^m \alpha_{t+1}[j] y_{it}\phi(x_{it})</script>
+
+<p>带回到$l(\omega)$，通过T次随机次梯度下降伪代码如下：</p>
+
+<p><img src="http://img.blog.csdn.net/20170413112616958?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTI2Mzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" /></p>
+
+<p>根据输出$\alpha_{T+1}$得到$\omega$
+映射φ（·）并不明确指定，而是训练样本通过映射φ（·）之后通过核计算K（x，x’）=φ（x），φ（x’）得到内积结果。本文中，无需将目标函数转换为对偶函数，直接最小化原始问题，同时仍然使用核方法。Pegasos算法可以仅使用内核来实现求解，而不需要直接访问特征向量$\phi （x）$或显式访问权重向量$\omega$<br />
+因为需要遍历m个样本，故时间复杂度为$O{(\frac m {\epsilon \lambda})}$</p>
+
+<h2 id="结合偏置项b">结合偏置项b</h2>
+<p>当正负样本比例不均衡的时候，偏置项比较重要。
+在算法的外部加一层找寻b的外循环，即对于不同的b值，均使用pegasos求解出各自的$\omega$。优化问题是$ \min_\omega \frac \lambda 2||w||^2+J(b;S)$目标函数如下：</p>
+
+<script type="math/tex; mode=display">J(b;S) = \min_\omega \frac 1 m \sum l((\omega,b);(x,y))</script>
+
+<p><script type="math/tex">% <![CDATA[
+J(b;S) = \min_\omega \frac 1 m \sum_{(x,y)\in S} [1-y(<\omega,x>+b)]_+ %]]></script>
+因为b是固定值，在内层循环求解时，仍然可以使用pegasos算法,且这种方法的时间复杂度仍然保持在$O{(\frac d {\epsilon \lambda})}$</p>
+<h2 id="实验比对">实验比对</h2>
+<p>pegasos算法与SDCA,SVM_LIGHT,LASVM比较</p>
+<h3 id="线性核">线性核</h3>
+<p><img src="http://img.blog.csdn.net/20170413120005507?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTI2Mzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" />
+第一行是原目标函数的收敛曲线，第二行是分类误差率。横坐标是运行时间。</p>
+
+<h3 id="高斯核非线性核">高斯核（非线性核）</h3>
+<p><img src="http://img.blog.csdn.net/20170413120248762?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvc2luYXRfMjc2MTI2Mzk=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast" alt="这里写图片描述" />
+第一行是原目标函数的收敛曲线，第二行是log归约后的目标函数收敛曲线，第三行是分类误差率。横坐标是运行时间。</p>
+
+
+            </article>
+        </div>
+      </div>
+      <div class="panel docs-content">
+        <article class="post-content">
+          <div class="wrapper">
+            
+
+
+  <div class="ds-thread" data-thread-key="/2017/04/10/pegasos/" data-title="svm随机次梯度下降算法-pegasos" data-url="http://localhost:4000/2017/04/10/pegasos/"></div>
+
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"luoyan35714"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+</script>
+
+
+ 
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+    <footer class="footer" role="contentinfo">
+	<div class="container">
+		<p class="copyright">Copyright &copy; 2014-2017 <a href="http://www.hifreud.com/Resume.io/"><code>鲍世琦</code></a>.</p>
+		<p>Powered by <a href="http://jekyllrb.com">Jekyll</a>, theme from <a href="http://lesscss.cn/">Less</a></p>
+	</div>
+</footer>
+
+<script src="/styles/js/jquery.min.js"></script>
+<script src="/styles/js/bootstrap.min.js"></script>
+<script src="/styles/js/holder.min.js"></script>
+<script src="/styles/js/lessismore.js"></script>
+<script src="/styles/js/application.js"></script>
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  </body>
+</html>
