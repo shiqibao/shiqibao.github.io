@@ -1,14 +1,14 @@
 # Site settings
-name: 记录之道 
+name: shiqibao 
 email: baoshiqi27@163.com
 author: 鲍世琦
-url: http://www.hifreud.com
-resume_site: http://www.hifreud.com/Resume.io/
+url: http://shiqibao.github.io
+resume_site: http://blog.csdn.net/sinat_27612639
 github: https://github.com/shiqibao/
 baseurl: ""
 description: Actually, less is more!
-meta_description: 康志华;个人博客;学而不思则罔;思而不学则殆;生命不止;折腾不休
-motto: It's our wits that make us men.
+meta_description: 鲍世琦;个人博客;
+motto: shiqibao
 banner: 学而不思则罔，思而不学则殆。
 
 #permalink: /:categories/:year/:month/:day/:title/
