@@ -13,7 +13,7 @@ permalink: /books/
 
 + 《Think in java 4th》
 + 《鸟哥的Linux私房菜基础学习篇-第三版》
-+ 《重构》
++ 《prml》
 + 《Getting real》
 + 《深入JVM虚拟机》
 + 《Head first设计模式》
