@@ -5,7 +5,8 @@ author: 鲍世琦
 url: http://shiqibao.github.io
 resume_site: http://blog.csdn.net/sinat_27612639
 github: https://github.com/shiqibao/
-baseurl: ""
+baseurl: "/"
+encoding: utf-8
 description: Actually, less is more!
 meta_description: 鲍世琦;个人博客;
 motto: shiqibao
