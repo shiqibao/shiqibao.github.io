@@ -24,6 +24,8 @@ highlighter: Pygments
 # Build settings
 markdown: kramdown
 
+kramdown:
+   input: GFM
 baidu_analysis: 94be4b0f9fc5d94cc0d0415ea6761ae9
 
 FB:
